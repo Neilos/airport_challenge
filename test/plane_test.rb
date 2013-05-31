@@ -7,7 +7,7 @@ describe Plane do
   before do
     @plane = Plane.new
   end
-
+  
   it "should be able to land" do
     @plane.must_respond_to :land!
   end

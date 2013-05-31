@@ -7,12 +7,18 @@ require '../lib/airport'
 describe Airport do
   before do
     @airport = Airport.new
-    @small_capacity_airport = Airport.new(2)
-    @plane1 = Plane.new
-    @plane2 = Plane.new
-    @plane3 = Plane.new
-    @plane4 = Plane.new
-    @plane5 = Plane.new
+    @six_planes = [
+      @plane1 = Plane.new,
+      @plane2 = Plane.new,
+      @plane3 = Plane.new,
+      @plane4 = Plane.new,
+      @plane5 = Plane.new,
+      @plane6 = Plane.new,
+    ]
+    def @airport.weather_state
+      :sunny
+    end
+    @big_airport = Airport.new(6)
   end
 
   # test_plane_can_land  
@@ -32,9 +38,6 @@ describe Airport do
   # A plane currently in the airport can be requested to take off.
   # test_plane_can_take_off
   it "should be able to request planes to take off but only if they are in the airport" do
-    def @airport.weather_state
-      :sunny
-    end
     @airport.land_plane(@plane1)
     @airport.instruct_take_off(@plane1)
     @plane1.landed?.must_equal false
@@ -46,28 +49,21 @@ describe Airport do
 
   # inserted test
   it "should know when it is full (of planes)" do
-    @small_capacity_airport = Airport.new(2)
-    def @small_capacity_airport.weather_state
-      :sunny
-    end
-
-    @small_capacity_airport.land_plane(@plane1)
-    @small_capacity_airport.land_plane(@plane2)
-    @small_capacity_airport.full?.must_equal true
-    @small_capacity_airport.instruct_take_off(@plane1)
-    @small_capacity_airport.full?.must_equal false
+    @airport.land_plane(@plane1)
+    @airport.land_plane(@plane2)
+    @airport.full?.must_equal true
+    @airport.instruct_take_off(@plane1)
+    @airport.full?.must_equal false
   end
 
   # No more planes can be added to the airport, if it's full.
   # It is up to you how many planes can land in the airport and how that is impermented.
   # test_no_plane_can_land_if_airport_is_full
   it "should not land planes if airport is full" do
-    @small_capacity_airport = Airport.new(2)
+    @airport.land_plane(@plane1)
+    @airport.land_plane(@plane2)
 
-    @small_capacity_airport.land_plane(@plane1)
-    @small_capacity_airport.land_plane(@plane2)
-
-    lambda { @small_capacity_airport.land_plane(@plane3) }.must_raise(StandardError)
+    lambda { @airport.land_plane(@plane3) }.must_raise(StandardError)
 
     @plane1.landed?.must_equal true
     @plane2.landed?.must_equal true
@@ -79,17 +75,12 @@ describe Airport do
   # If the airport is full then no planes can land
   #test_that_plane_can_land_after_airport_is_full_and_a_take_off_happened
   it "a full airport can land planes after a plane take off happens" do
-    @small_capacity_airport = Airport.new(2)
-    def @small_capacity_airport.weather_state
-      :sunny
-    end
+    @airport.land_plane(@plane1)
+    @airport.land_plane(@plane2)
     
-    @small_capacity_airport.land_plane(@plane1)
-    @small_capacity_airport.land_plane(@plane2)
-    
-    @small_capacity_airport.instruct_take_off(@plane1)
+    @airport.instruct_take_off(@plane1)
 
-    @small_capacity_airport.land_plane(@plane3)
+    @airport.land_plane(@plane3)
 
     @plane1.landed?.must_equal false
     @plane2.landed?.must_equal true
@@ -115,9 +106,6 @@ describe Airport do
   # When the plane takes of from the airport, the plane's status should become "flying"
   # test_plane_has_a_flying_status_after_take_off
   it "should change status of a plane to 'flying' after instructing plane to take off" do
-    def @airport.weather_state
-      :sunny
-    end
     @airport.land_plane(@plane1)
     @airport.instruct_take_off(@plane1)
     @plane1.status.must_equal :flying
@@ -130,18 +118,23 @@ describe Airport do
   # This will require stubbing to stop the random return of the weather.
   # test_that_no_plane_can_take_off_with_a_storm_brewing
   it "should not allow planes to take off with a storm brewing" do
+    @airport.land_plane(@plane1)
     def @airport.weather_state
       :stormy
     end
-    @airport.land_plane(@plane1)
     @airport.instruct_take_off(@plane1)
-    @plane1.status.wont_equal :flying
+    @airport.landed_planes.must_include @plane1
   end
 
   # As with the above test, if the airport has a weather condition of stormy,
   # the plane can not land, and must not be in the airport
   # test_that_no_plane_can_land_when_there_is_a_storm_brewing
-  it " test_that_no_plane_can_land_when_there_is_a_storm_brewing" do
+  it "should not allow planes to land if a storm is brewing" do
+    def @airport.weather_state
+      :stormy
+    end
+    @airport.land_plane(@plane1)
+    @airport.landed_planes.wont_include @plane1
   end
 
   # grand final
@@ -150,7 +143,26 @@ describe Airport do
   # Check when all the planes have landed that they have the right status "landed"
   # Once all the planes are in the air again, check that they have the status of flying!
   #test_all_planes_can_land_then_all_planes_in_airport_can_takeoff
-  it "test_all_planes_can_land_then_all_planes_in_airport_can_takeoff" do
+  it "should land all planes and then all planes in airport can takeoff" do
+    until @big_airport.full?
+      @six_planes.each do |plane|
+        @big_airport.land_plane(plane) unless (plane.landed? || @big_airport.weather_state == :stormy)
+      end
+    end
+    
+    @big_airport.landed_planes.each do |plane|
+      plane.status.must_equal :landed
+    end
+
+    until @big_airport.landed_planes.count ==0
+      @big_airport.instruct_take_off(@big_airport.landed_planes[-1]) unless (@big_airport.weather_state == :stormy)
+    end
+
+    @six_planes.each do |plane|
+      plane.status.must_equal :flying
+      plane.status.wont_equal :landed
+    end
+
   end
 
 end
