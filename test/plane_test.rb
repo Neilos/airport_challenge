@@ -19,22 +19,22 @@ describe Plane do
   it "should know whether it is landed" do
     @plane.must_respond_to :landed?
   end
+  
+  # When we create a new plane, it should have a "flying" status, thus planes can not be created in the airport.
+  # test_plane_has_a_status_after_it_is_created
+  it "should have a 'flying' status after it is created" do
+    puts "#{@plane.status}"
+    @plane.status.must_equal :flying
+  end 
 
-  it "should be landed when first initialized" do
-    @new_plane = Plane.new
-    @new_plane.landed?
+  it "should not be landed when flying" do
+    @plane.landed?.must_equal false
   end
 
   it "should know whether it has landed" do
-    @plane.take_off!
     @plane.landed?.must_equal false
     @plane.land!
     @plane.landed?.must_equal true
-  end
-
-  it "should not be landed when flying" do
-    @plane.take_off!
-    @plane.landed?.must_equal false
   end
 
   it "should be flying when flying" do
