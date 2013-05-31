@@ -6,14 +6,27 @@ require '../lib/airport'
 
 describe Airport do
   before do
-    @airport = Airport.new    
+    @airport = Airport.new
+    @plane1 = Plane.new
+    @plane2 = Plane.new
   end
 
-  it " test_plane_can_land" do
+  it "test_plane_can_land" do
+    @airport.land_plane(@plane1)
+    @plane1.landed?.must_equal true
+  end
+
+  it "airport knows about landed planes" do
+    @airport.land_plane(@plane1)
+    @airport.land_plane(@plane2)
+    @airport.landed_planes.must_include @plane1
+    @airport.landed_planes.must_include @plane2
   end
 
   # A plane currently in the airport can be requested to take off.
-  it " test_plane_can_take_off" do
+  it "test_plane_can_take_off" do
+    @airport.instruct_take_off(@plane1)
+    @plane1.landed?
   end
 
   # No more planes can be added to the airport, if it's full.
