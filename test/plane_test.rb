@@ -25,7 +25,7 @@ describe Plane do
     @new_plane.landed?
   end
 
-  it "should know it is landed whether it has landed" do
+  it "should know whether it has landed" do
     @plane.take_off!
     @plane.landed?.must_equal false
     @plane.land!
@@ -35,6 +35,11 @@ describe Plane do
   it "should not be landed when flying" do
     @plane.take_off!
     @plane.landed?.must_equal false
+  end
+
+  it "should be flying when flying" do
+    @plane.take_off!
+    @plane.flying?.must_equal true
   end
 
 end
