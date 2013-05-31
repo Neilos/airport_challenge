@@ -32,6 +32,9 @@ describe Airport do
   # A plane currently in the airport can be requested to take off.
   # test_plane_can_take_off
   it "should be able to request planes to take off but only if they are in the airport" do
+    def @airport.weather_state
+      :sunny
+    end
     @airport.land_plane(@plane1)
     @airport.instruct_take_off(@plane1)
     @plane1.landed?.must_equal false
@@ -44,6 +47,9 @@ describe Airport do
   # inserted test
   it "should know when it is full (of planes)" do
     @small_capacity_airport = Airport.new(2)
+    def @small_capacity_airport.weather_state
+      :sunny
+    end
 
     @small_capacity_airport.land_plane(@plane1)
     @small_capacity_airport.land_plane(@plane2)
@@ -74,7 +80,10 @@ describe Airport do
   #test_that_plane_can_land_after_airport_is_full_and_a_take_off_happened
   it "a full airport can land planes after a plane take off happens" do
     @small_capacity_airport = Airport.new(2)
-
+    def @small_capacity_airport.weather_state
+      :sunny
+    end
+    
     @small_capacity_airport.land_plane(@plane1)
     @small_capacity_airport.land_plane(@plane2)
     
@@ -106,6 +115,9 @@ describe Airport do
   # When the plane takes of from the airport, the plane's status should become "flying"
   # test_plane_has_a_flying_status_after_take_off
   it "should change status of a plane to 'flying' after instructing plane to take off" do
+    def @airport.weather_state
+      :sunny
+    end
     @airport.land_plane(@plane1)
     @airport.instruct_take_off(@plane1)
     @plane1.status.must_equal :flying
@@ -117,7 +129,13 @@ describe Airport do
 
   # This will require stubbing to stop the random return of the weather.
   # test_that_no_plane_can_take_off_with_a_storm_brewing
-  it " test_that_no_plane_can_take_off_with_a_storm_brewing" do
+  it "should not allow planes to take off with a storm brewing" do
+    def @airport.weather_state
+      :stormy
+    end
+    @airport.land_plane(@plane1)
+    @airport.instruct_take_off(@plane1)
+    @plane1.status.wont_equal :flying
   end
 
   # As with the above test, if the airport has a weather condition of stormy,
