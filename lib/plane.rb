@@ -1,28 +1,17 @@
-
 class Plane
+  attr_accessor :status
+  private :status=
 
-attr_reader :status
+  FLYING = :flying
+  LANDED = :landed
 
-def initialize
-  self.take_off!
-end
+  def initialize
+    @status = FLYING
+  end
 
-def take_off!
-  @status = :flying
-end
+  def take_off!; self.status = FLYING; end
+  def land!; self.status = LANDED; end
 
-def land!
-  @status = :landed
-end
-
-
-def landed?
-  self.status == :landed
-end
-
-def flying?
-  self.status == :flying
-end
-
-
+  def landed?; self.status == LANDED; end
+  # def flying?; status == :flying; end
 end

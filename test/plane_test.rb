@@ -16,30 +16,31 @@ describe Plane do
     @plane.must_respond_to :take_off!
   end
 
-  it "should know whether it is landed" do
-    @plane.must_respond_to :landed?
+  it "should have a publically readable status" do
+    @plane.must_respond_to :status
   end
   
-  # When we create a new plane, it should have a "flying" status, thus planes can not be created in the airport.
-  # test_plane_has_a_status_after_it_is_created
+  it "should have a 'landed' status after it has landed" do
+    @plane.land!
+    @plane.status.must_equal Plane::LANDED
+  end
+
+  it "should have a flying status after take-off" do
+    @plane.land!
+    @plane.take_off!
+    @plane.status.must_equal Plane::FLYING
+  end
+
   it "should have a 'flying' status after it is created" do
-    puts "#{@plane.status}"
-    @plane.status.must_equal :flying
+    new_plane = Plane.new
+    new_plane.status.must_equal Plane::FLYING
   end 
 
-  it "should not be landed when flying" do
-    @plane.landed?.must_equal false
-  end
-
   it "should know whether it has landed" do
-    @plane.landed?.must_equal false
     @plane.land!
     @plane.landed?.must_equal true
-  end
-
-  it "should be flying when flying" do
     @plane.take_off!
-    @plane.flying?.must_equal true
+    @plane.landed?.wont_equal true
   end
 
 end
