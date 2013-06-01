@@ -62,6 +62,12 @@ describe Airport do
   end
 
   # ADDTIONAL TEST
+  it "should not accept landed planes without landing them first" do
+    @airport.landed_planes << @plane1
+    @airport.landed_planes_count.must_equal 0
+  end
+
+  # ADDTIONAL TEST
   it "should know about landed planes" do
     @airport.land_plane(@plane1)
     @airport.land_plane(@plane2)
@@ -143,6 +149,13 @@ describe Airport do
   # include a weather condition using a module
   # The weather must be random and only have two states "sunny" or "stormy".
   # Try and take off a plane, but if the weather is stormy, the plane can not take off and must remain in the airport.
+  it "should be weather aware" do
+    @airport.must_be_kind_of WeatherAware
+  end
+
+  it "should know about the weather" do
+    @airport.must_respond_to :current_weather_conditions
+  end
 
   # This will require stubbing to stop the random return of the weather.
   # test_that_no_plane_can_take_off_with_a_storm_brewing

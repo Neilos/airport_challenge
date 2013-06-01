@@ -9,6 +9,7 @@ module WeatherAware
   def weather
     @weather ||= Weather.new
   end
+  private :weather
 
   def current_weather_conditions
     weather.generate_conditions
