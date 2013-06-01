@@ -3,14 +3,13 @@ require 'minitest/autorun'
 require 'minitest/mock'
 require '../lib/weather_awareness'
 
-class WeatherAnnouncer
+class WeatherAwareClass
   include WeatherAware
 end
 
-describe WeatherAnnouncer do
+describe WeatherAwareClass do
   before do
-    @weather_announcer = WeatherAnnouncer.new
-
+    @weather_announcer = WeatherAwareClass.new
   end
 
   it "should be aware of current_weather_conditions" do

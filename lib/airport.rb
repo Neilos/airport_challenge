@@ -1,6 +1,5 @@
 require_relative 'plane'
 require_relative 'weather_awareness'
-# require_relative 'airport_exception'
 
 class AirportException < StandardError
 end
