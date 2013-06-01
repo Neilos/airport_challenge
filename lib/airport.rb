@@ -1,34 +1,36 @@
 require_relative 'plane'
-require_relative 'weather_condition'
+require_relative 'weather_awareness'
 
 class Airport
-include WeatherCondition
-attr_reader :landed_planes
+include WeatherAware
+attr_accessor :capacity, :landed_planes
 
 
-def initialize(capacity=2)
-  @landed_planes = Array.new
-  @capacity = capacity
+def initialize(options={capacity: 2})
+  @capacity = options[:capacity]
+  @landed_planes = []
 end
 
 def land_plane(plane)
   raise(StandardError, "Airport is full.") if full?
-  if self.weather_state == :sunny
+  if current_weather_conditions == :sunny
     landed_planes.push plane if plane.land!
   end
 end
 
 def instruct_take_off(plane)
-  if (landed_planes.include? plane) && (self.weather_state == :sunny)
+  if landed_planes.include?(plane) && (current_weather_conditions == :sunny)
     plane.take_off!
     landed_planes.delete plane
   end
 end
 
-def full?
-  landed_planes.length == @capacity
+def landed_planes_count
+  landed_planes.count
 end
 
-
+def full?
+  landed_planes_count == self.capacity
+end
 
 end

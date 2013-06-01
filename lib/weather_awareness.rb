@@ -11,7 +11,6 @@ module WeatherAware
   end
 
   def current_weather_conditions
-    @current_weather_conditions ||= 
     weather.generate_conditions
   end
 
