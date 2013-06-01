@@ -41,6 +41,8 @@ describe Airport do
 
   # ADDITIONAL TEST
   it "should be able to instruct a plane to take off and in so doing change it's status" do
+    @airport.land_plane(@plane1)
+    @plane1.status.must_equal Plane::LANDED
     @airport.instruct_take_off(@plane1)
     @plane1.status.must_equal Plane::FLYING
   end
@@ -62,7 +64,7 @@ describe Airport do
   end
 
   # ADDTIONAL TEST
-  it "should not accept landed planes without landing them first" do
+  it "should not not be possible to tamper with landed planes from outside the class" do
     @airport.landed_planes << @plane1
     @airport.landed_planes_count.must_equal 0
   end
@@ -91,7 +93,7 @@ describe Airport do
     @airport.instruct_take_off(@plane1)
     @plane1.status.must_equal Plane::FLYING
     @plane2.land!
-    @airport.instruct_take_off(@plane2)
+    lambda { @airport.instruct_take_off(@plane2) }.must_raise AirportException
     @plane2.status.must_equal Plane::LANDED
   end
 
@@ -102,7 +104,7 @@ describe Airport do
     @airport.land_plane(@plane1)
     @airport.land_plane(@plane2)
 
-    lambda { @airport.land_plane(@plane3) }.must_raise(StandardError)
+    lambda { @airport.land_plane(@plane3) }.must_raise(AirportException)
 
     @plane1.status.must_equal Plane::LANDED
     @plane2.status.must_equal Plane::LANDED
@@ -128,21 +130,18 @@ describe Airport do
   # test_plane_has_a_flying_status_after_it_is_created
   ###########################################################
 
-
-
   # When we land a plane at the airport, the plane in question should have its status changed to "landed"
   # test_plane_has_a_landed_status_after_landing
   it "should change the status of a plane to 'landed' when landing a plane" do
-    @airport.land_plane(@plane1)
+    @airport.land_plane(@plane1).wont_be_nil
     @plane1.status.must_equal Plane::LANDED
   end
-
 
   # When the plane takes of from the airport, the plane's status should become "flying"
   # test_plane_has_a_flying_status_after_take_off
   it "should change status of a plane to 'flying' after instructing plane to take off" do
     @airport.land_plane(@plane1)
-    @airport.instruct_take_off(@plane1)
+    @airport.instruct_take_off(@plane1).wont_be_nil
     @plane1.status.must_equal Plane::FLYING
   end
 
@@ -153,25 +152,25 @@ describe Airport do
     @airport.must_be_kind_of WeatherAware
   end
 
-  it "should know about the weather" do
+  it "should know about the current weather conditions" do
     @airport.must_respond_to :current_weather_conditions
   end
 
   # This will require stubbing to stop the random return of the weather.
   # test_that_no_plane_can_take_off_with_a_storm_brewing
-  it "should not allow planes to take off with a storm brewing" do
+  it "should NOT allow planes to TAKE OFF with a storm brewing" do
     @airport.land_plane(@plane1)
     def @airport.current_weather_conditions; :stormy; end
-    @airport.instruct_take_off(@plane1)
+    @airport.instruct_take_off(@plane1).must_be_nil
     @airport.landed_planes.must_include @plane1
   end
 
   # As with the above test, if the airport has a weather condition of stormy,
   # the plane can not land, and must not be in the airport
   # test_that_no_plane_can_land_when_there_is_a_storm_brewing
-  it "should not allow planes to land if a storm is brewing" do
+  it "should NOT allow planes to LAND if a storm is brewing" do
     def @airport.current_weather_conditions; :stormy; end
-    @airport.land_plane(@plane1)
+    @airport.land_plane(@plane1).must_be_nil
     @airport.landed_planes.wont_include @plane1
   end
 
